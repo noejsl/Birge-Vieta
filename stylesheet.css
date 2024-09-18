@@ -1,0 +1,126 @@
+/* Estilos para la tabla de la matriz */
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1c1c1c;
+}
+
+mtable {
+    display: inline-table;
+    border-left: 2px solid #d9d5e2;
+    border-right: 2px solid #d9d5e2;
+    border-collapse: collapse;
+    margin: 0.5em 0;
+    color: #d9d5e2;
+}
+
+mtr {
+    display: table-row;
+    font-size: 1.5em;
+}
+
+mtd {
+    display: table-cell;
+    text-align: center;
+    padding: 0.5ex 0.4em;
+}
+
+/* Estilos para la sección de visualización de la matriz */
+.seeMat {
+    display: grid;
+    justify-content: center;
+    width: auto;
+}
+
+.seeMat span{
+    color: white;
+}
+
+
+/* Estilos para las filas de la matriz */
+mrow {
+    display: contents;
+}
+
+/* Estilos para los encabezados */
+h2, h3, h4 {
+    margin: 0.5em 0;
+    text-align: center;
+    color: #9788db;
+}
+
+h1{
+    margin: 0.5em 0;
+    text-align: center;
+    color: #8400ff;
+    font-size: 2em;
+    font-family: 'Times New Roman', Times, serif
+}
+
+/* Estilos para el contenedor principal */
+.main {
+    text-align: center;
+    margin: 20px;
+    padding: 20px;
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    color: #e0e0e0fb;
+    font-family: sans-serif;
+}
+
+/* Estilos para los botones */
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: #3d1d88;
+    color: #fdfbfb;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #240e55;
+}
+
+/* Estilos para los inputs */
+input[type="number"] {
+    padding: 10px;
+    font-size: 1em;
+    margin: 5px;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border: 1px solid #3d1d88;
+    border-radius: 5px;
+    text-align: center;
+    width: 80px;
+}
+
+/* Estilos para las soluciones */
+#solution, #answers {
+    margin-top: 20px;
+    text-align: center;
+    color: #3d1d88;
+}
+
+/* Estilos responsivos */
+@media (max-width: 600px) {
+    .main {
+        width: 90%;
+        padding: 10px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+    }
+
+    input[type="number"] {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
