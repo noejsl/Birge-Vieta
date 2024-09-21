@@ -68,6 +68,12 @@ h1{
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     color: #e0e0e0fb;
     font-family: sans-serif;
+
+    #ecuaciones {
+        input[type="number"] {
+            width: 40px;
+        }
+    }
 }
 
 /* Estilos para los botones */
@@ -120,7 +126,8 @@ input[type="number"] {
     }
 
     input[type="number"] {
-        width: 100%;
+        width: auto;
+        max-width: 100%;
         margin: 5px 0;
     }
 }

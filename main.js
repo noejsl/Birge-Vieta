@@ -86,8 +86,13 @@ function saveIndex() {
                 alert(`Para que sea una función de grado ${n}, el coeficiente de x^${n} no puede ser 0`);
                 return;
             } else {
-                value = parseFloat(value);
-                mat[i] = value;
+                if (i == (n - 1) && value == 0) {
+                    alert(`El coeficiente de x no puede ser 0 para continuar con el método`);
+                    return;
+                } else {
+                    value = parseFloat(value);
+                    mat[i] = value;
+                }
             }
         }
     }
@@ -98,7 +103,7 @@ function saveIndex() {
     answers.innerHTML = '';
 
     let btnSolve = document.createElement('button');
-    btnSolve.type = 'button'; 
+    btnSolve.type = 'button';
     btnSolve.textContent = 'Resolver';
     btnSolve.onclick = solve;
 
@@ -106,7 +111,7 @@ function saveIndex() {
     mtx.textContent = 'Polinomio: ';
 
 
-    console.log(mat);
+    console.log('Se guardo el polinomio con los coeficientes: ', mat);
     polinomio = crearPolinomio(mat);
 
     seeMat.appendChild(mtx)
@@ -120,12 +125,12 @@ function saveIndex() {
 function crearPolinomio(mat) {
     let n = mat.length;
     let polinomio = document.createElement('span');
-    polinomio.style.color = 'white'; 
+    polinomio.style.color = 'white';
 
     let mrow = document.createElement('span');
 
     let P = document.createElement('span');
-    P.innerHTML = `P<sub>${n-1}</sub>(x) = `;
+    P.innerHTML = `P<sub>${n - 1}</sub>(x) = `;
     mrow.appendChild(P);
 
     for (let i = 0; i < n; i++) {
@@ -181,101 +186,147 @@ function clearEc() {
 }
 
 function solve() {
-    let contraiz = 0;
     let raices = [];
-    let i = 0;
-    let grado = mat.length - 1;
-    let n = mat.length; 
+    let grado = mat.length;
+    let n = mat.length;
     let p1, p2;
-    let x = -mat[n-1] / mat[n-2];
+    let polinomioresult;
 
-    while (i < 9) {
+    for (let i = 0; i < grado; i++) {
+
         n = mat.length; // Recalcular después de modificar el polinomio
+        let findSol = false;
+        let matResult;
+        let x;
+        let aux = 0;
 
-        if (i != 0) {
-            x = roundIfClose(x - p1 / p2); 
+        while (!findSol) {
+
+            // Validar que no sea la primera iteracion para calcular x
+            if (aux != 0) {
+                x = roundIfClose(x - p1 / p2);
+            } else {
+                x = roundIfClose(-mat[n - 1] / mat[n - 2]);
+            }
+
+            // Inicializar matrices de operaciones y respuestas
+            let matOp1 = [0];
+            let matResp1 = [mat[0]];
+
+            // Calcular matOp1 y matResp1
+            for (let j = 0; j < n - 1; j++) {
+                let valuematOp1 = matResp1[j] * x;
+                valuematOp1 = roundIfClose(valuematOp1);
+                matOp1.push(valuematOp1);
+
+                let valuematResp1 = matOp1[j + 1] + mat[j + 1];
+                valuematResp1 = roundIfClose(valuematResp1);
+                matResp1.push(valuematResp1);
+            }
+
+            p1 = roundIfClose(matResp1[n - 1]);
+            console.log(p1);
+
+            if (Math.abs(p1) < 1e-3) {
+                matResult = [mat, matOp1, matResp1];
+
+                solution.appendChild(document.createElement('br'));
+
+                let numite = document.createElement('h2');
+                numite.textContent = `Iteración ${aux + 1}`;
+                solution.appendChild(numite);
+
+                let valuex = document.createElement('h3');
+                valuex.textContent = `x = ${x}`;
+                solution.appendChild(valuex);
+
+                console.log('Se encontro una raiz: ', x);
+                raices.push(x);
+
+                solution.appendChild(document.createElement('br'));
+
+                mat = matResp1.slice(0, -1); // Reducir el polinomio
+                console.log('MATRIZ REDUCIDA: ', mat);
+
+                let mathResult = printMatrix(matResult);
+                solution.appendChild(mathResult);
+
+                let raiz = document.createElement('h3');
+                raiz.textContent = `x = ${x} es una raíz`;
+                solution.appendChild(raiz);
+
+
+                // Recalcula el nuevo valor de x después de encontrar una raíz si el polinomio tiene más de un término
+                if (mat.length > 1) {
+                    x = (mat[mat.length - 1] * -1) / mat[mat.length - 2];
+
+                    polinomioresult = crearPolinomio(mat);
+                    solution.appendChild(document.createElement('br'));
+                    solution.appendChild(document.createElement('br'));
+                    solution.appendChild(polinomioresult);
+                    solution.appendChild(document.createElement('br'));
+
+                } else {
+                    console.log('Las raices son: ', raices);
+                    return;
+                }
+
+                findSol = true;
+                break;
+            }
+
+            let matOp2 = [0];
+            let matResp2 = [mat[0]];
+
+            // Calcular matOp2 y matResp2
+            for (let j = 0; j < n - 2; j++) {
+                let valuematOp2 = matResp2[j] * x;
+                valuematOp2 = roundIfClose(valuematOp2);
+                matOp2.push(valuematOp2);
+
+                let valuematResp2 = matOp2[j + 1] + matResp1[j + 1];
+                valuematResp2 = roundIfClose(valuematResp2);
+                matResp2.push(valuematResp2);
+            }
+
+            p2 = roundIfClose(matResp2[n - 2]);
+
+            if (p2 !== 0) {
+                matResult = [mat, matOp1, matResp1, matOp2, matResp2];
+
+                solution.appendChild(document.createElement('br'));
+
+                let numite = document.createElement('h2');
+                numite.textContent = `Iteración ${aux + 1}`;
+                solution.appendChild(numite);
+
+                let valuex = document.createElement('h3');
+                valuex.textContent = `x = ${x}`;
+                solution.appendChild(valuex);
+
+                let mathResult = printMatrix(matResult);
+                solution.appendChild(mathResult);
+            } else {
+                let error = document.createElement('h3');
+                error.textContent = `No se puede continuar con el metodo, se encontraron raices complejas`;
+                error.style.color = 'red';
+                solution.appendChild(error);
+
+                return;
+            }
+
+            if (aux == 49) {
+                let error = document.createElement('h3');
+                error.textContent = `La raiz ${i + 1} no converge a algun valor después de 50 iteraciones`;
+                error.style.color = 'red';
+                solution.appendChild(error);
+
+                return;
+            }
+
+            aux++;
+
         }
-
-        // Inicializar matrices de operaciones y respuestas
-        let matOp1 = [0];
-        let matResp1 = [mat[0]];
-
-        // Calcular matOp1 y matResp1
-        for (let j = 0; j < n - 1; j++) {
-            let valuematOp1 = matResp1[j] * x;
-            matOp1.push(valuematOp1);
-
-            let valuematResp1 = matOp1[j + 1] + mat[j + 1];
-            matResp1.push(valuematResp1);
-        }
-
-        let matOp2 = [0];
-        let matResp2 = [mat[0]];
-
-        // Calcular matOp2 y matResp2
-        for (let j = 0; j < n - 2; j++) {
-            let valuematOp2 = matResp2[j] * x;
-            matOp2.push(valuematOp2);
-
-            let valuematResp2 = matOp2[j + 1] + matResp1[j + 1];
-            matResp2.push(valuematResp2);
-        }
-
-         p1 = matResp1[n - 1];
-         p2 = matResp2[n - 2];
-
-        p1 = roundIfClose(p1);
-        p2 = roundIfClose(p2);
-
-        console.log(x);
-        console.log(mat);
-        console.log(matOp1);
-        console.log(matResp1);
-        console.log(matOp2);
-        console.log(matResp2);
-        console.log(p1, p2);
-
-        let matResult = [mat, matOp1, matResp1, matOp2, matResp2];
-
-        let numite = document.createElement('h2');
-        numite.textContent = `Iteración ${i + 1}`;
-        solution.appendChild(numite);
-
-        let valuex = document.createElement('h3');
-        valuex.textContent = `x = ${x}`;
-        solution.appendChild(valuex);
-
-        let mathResult = printMatrix(matResult);
-        solution.appendChild(mathResult);
-
-        if (p1 === 0) {
-            contraiz++;
-
-            let valuex = document.createElement('h3');
-            valuex.textContent = `x = ${x}, es una raíz`;
-            mat = matResp1.slice(0, -1); // Reducir el polinomio
-            let polinomioresult = crearPolinomio(mat);
-            raices.push(valuex);
-            solution.appendChild(valuex);
-            solution.appendChild(document.createElement('br'));
-            solution.appendChild(polinomioresult);
-
-            // Recalcula el nuevo valor de x después de encontrar una raíz
-            x = -mat[mat.length - 1] / mat[mat.length - 2];
-        }
-
-        if (n - 1 === 1) {
-            contraiz++;
-            let valuex = document.createElement('h3');
-            valuex.textContent = `x = ${x}, es una raíz`;
-            raices.push(valuex);
-            solution.appendChild(valuex);
-            solution.appendChild(document.createElement('br'));
-            solution.appendChild(polinomioresult);
-            return;
-        }
-
-        i++;
     }
 }
 
@@ -288,8 +339,9 @@ function getN() {
 }
 
 
-function roundIfClose(num, precision = 4) {
+function roundIfClose(num) {
     // Redondear a un número fijo de decimales
+    let precision = 3;
     let roundedNum = parseFloat(num.toFixed(precision));
 
     // Encuentra el entero más cercano
