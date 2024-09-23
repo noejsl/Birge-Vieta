@@ -5,6 +5,7 @@ let matOp1 = [];
 let matOp2 = [];
 let matResp1 = [];
 let matResp2 = [];
+let critConv;
 
 // Referencias a elementos del DOM
 let divEc = document.getElementById('ecuaciones');
@@ -27,7 +28,7 @@ function crearEc() {
 
     let button = document.createElement('button');
     button.type = 'button'; // Cambiado a 'button' para evitar el envío del formulario
-    button.textContent = 'Mostrar Matriz';
+    button.textContent = 'Mostrar polinomio';
     button.onclick = saveIndex;
     let P = document.createElement('span');
     P.innerHTML = `P<sub>${n}</sub> (x) = `;
@@ -65,6 +66,18 @@ function crearEc() {
     }
 
     divEc.appendChild(document.createElement('br'));
+
+    let label = document.createElement('label');
+    label.textContent = 'Criterio de convergencia: ';
+    divEc.appendChild(label);
+
+    let convInput = document.createElement('input');
+    convInput.type = 'number';
+    convInput.id = 'conv';
+    convInput.placeholder = 'Ej. 0.1';
+    divEc.appendChild(convInput);
+
+    divEc.appendChild(document.createElement('br'));
     divEc.appendChild(document.createElement('br'));
 
     divEc.appendChild(button);
@@ -73,6 +86,8 @@ function crearEc() {
 function saveIndex() {
     let n = getN();
     mat = [];
+    let conv = document.getElementById('conv');
+
 
     // Guardar valores de la matriz y resultados
     for (let i = 0; i <= n; i++) {
@@ -94,6 +109,18 @@ function saveIndex() {
                     mat[i] = value;
                 }
             }
+        }
+    }
+
+    if (conv.value === '' || isNaN(conv.value)) {
+        alert('Ingresa un criterio de convergencia');
+        return;
+    } else {
+        if (conv.value < 0) {
+            alert('El criterio de convergencia debe ser un número positivo');
+            return;
+        } else {
+            critConv = parseFloat(conv.value);
         }
     }
 
@@ -183,6 +210,7 @@ function clearEc() {
     seeMat.innerHTML = '';
     solution.innerHTML = '';
     answers.innerHTML = '';
+
 }
 
 function solve() {
@@ -225,9 +253,35 @@ function solve() {
             }
 
             p1 = roundIfClose(matResp1[n - 1]);
-            console.log(p1);
 
-            if (Math.abs(p1) < 1e-3) {
+            //Funcion para validar si el polinomio es par y no tiene raices reales
+            function checkPol(n) {
+                if (n % 2 == 0) {
+                    console.log(matResp1);
+                    for (let i = 0; i < matResp1.length; i++) {
+                        if (i > 0 && matResp1[i] != 0 && i < matResp1.length - 1) {
+                            console.log(matResp1[i]);
+                            return false;
+                        }
+
+                        if (i == matResp1.length - 1 && matResp1[i] > 0) {
+                            return true;
+
+                        }
+                    }
+
+                }
+            };
+
+            if (checkPol(n - 1)) {
+                let error = document.createElement('h3');
+                error.textContent = `El polinomio es par y no tiene raices reales`;
+                error.style.color = 'red';
+                solution.appendChild(error);
+                return;
+            }
+
+            if (critConv >= Math.abs(p1) || p1 == 0) {
                 matResult = [mat, matOp1, matResp1];
 
                 solution.appendChild(document.createElement('br'));
@@ -251,6 +305,10 @@ function solve() {
                 let mathResult = printMatrix(matResult);
                 solution.appendChild(mathResult);
 
+                let seeConv = document.createElement('h3');
+                seeConv.textContent = `${Math.abs(p1)} <= ${critConv}`;
+                solution.appendChild(seeConv);
+
                 let raiz = document.createElement('h3');
                 raiz.textContent = `x = ${x} es una raíz`;
                 solution.appendChild(raiz);
@@ -258,7 +316,6 @@ function solve() {
 
                 // Recalcula el nuevo valor de x después de encontrar una raíz si el polinomio tiene más de un término
                 if (mat.length > 1) {
-                    x = (mat[mat.length - 1] * -1) / mat[mat.length - 2];
 
                     polinomioresult = crearPolinomio(mat);
                     solution.appendChild(document.createElement('br'));
@@ -266,8 +323,23 @@ function solve() {
                     solution.appendChild(polinomioresult);
                     solution.appendChild(document.createElement('br'));
 
+                    //Validacion de a0 == 0 
+                    if (mat[mat.length - 2] == 0) {
+                        let error = document.createElement('h3');
+                        error.textContent = `No se puede continuar con el metodo ya que el coeficiente de x es 0`;
+                        error.style.color = 'red';
+                        solution.appendChild(error);
+                        return;
+
+                    } else {
+                        x = (mat[mat.length - 1] * -1) / mat[mat.length - 2];
+                    }
+
                 } else {
                     console.log('Las raices son: ', raices);
+                    let raicesresult = document.createElement('h2');
+                    raicesresult.textContent = `Las raices son: ${raices.map(x => `x = ${x}`).join(', ')}`;
+                    answers.appendChild(raicesresult);
                     return;
                 }
 
@@ -341,7 +413,7 @@ function getN() {
 
 function roundIfClose(num) {
     // Redondear a un número fijo de decimales
-    let precision = 3;
+    let precision = 8;
     let roundedNum = parseFloat(num.toFixed(precision));
 
     // Encuentra el entero más cercano

@@ -71,7 +71,8 @@ h1{
 
     #ecuaciones {
         input[type="number"] {
-            width: 40px;
+            width: 75px;
+            
         }
     }
 }
@@ -103,7 +104,7 @@ input[type="number"] {
     border: 1px solid #3d1d88;
     border-radius: 5px;
     text-align: center;
-    width: 80px;
+    width: 60px
 }
 
 /* Estilos para las soluciones */
